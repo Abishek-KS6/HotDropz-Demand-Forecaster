@@ -1,0 +1,8 @@
+# Python dependencies for the HotDropz Cloud Forecast API
+# These packages must be installed on the cloud server (e.g., Google Cloud Functions)
+pandas==2.2.2
+prophet==1.1.0
+flask==3.0.3
+gunicorn==22.0.0
+# Specify Python version for cloud environment compatibility
+python-version == 3.11
