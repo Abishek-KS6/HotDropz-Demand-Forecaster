@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HotDropz - Seasonal Demand Forecasting</title>
-    
+
     <!-- Chosen Palette: Dark Navy (#111827, #1f2937), Gold/Amber (#f59e0b), and Cool Gray accents. -->
     <!-- Application Structure Plan: A single-page dashboard designed for clarity and actionability. The architecture uses a fixed header for branding and primary user actions (Profile, Data Analysis), a main control panel for data filtering (Season, Category, Region, Search), and a dynamic grid for displaying product forecast cards. Interactive modals are used for deep-dives (Product Details with charts), user management (Authentication), and advanced tools (AI Description Generator, Chatbot), ensuring the main view remains uncluttered. This structure was chosen to guide the user from a broad overview to specific, actionable insights efficiently. -->
     <!-- Visualization & Content Choices: 
@@ -17,32 +18,40 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #0f172a; /* A deep slate for the background */
+            background-color: #0f172a;
+            /* A deep slate for the background */
         }
+
         .chart-container {
             position: relative;
             height: 40vh;
             width: 100%;
         }
+
         /* Custom scrollbar for a modern look */
         ::-webkit-scrollbar {
             width: 8px;
         }
+
         ::-webkit-scrollbar-track {
             background: #1e293b;
         }
+
         ::-webkit-scrollbar-thumb {
             background: #f59e0b;
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #d97706;
         }
+
         /* Glassmorphism effect for modals */
         .modal-glass {
             background: rgba(30, 41, 59, 0.8);
@@ -50,42 +59,70 @@
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(245, 158, 11, 0.2);
         }
+
         /* Animation for toast notifications */
         .toast {
             animation: slideIn 0.5s forwards, fadeOut 0.5s 4.5s forwards;
         }
+
         @keyframes slideIn {
-            from { bottom: -100px; opacity: 0; }
-            to { bottom: 20px; opacity: 1; }
+            from {
+                bottom: -100px;
+                opacity: 0;
+            }
+
+            to {
+                bottom: 20px;
+                opacity: 1;
+            }
         }
+
         @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; display: none; }
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+                display: none;
+            }
         }
     </style>
 </head>
+
 <body class="bg-slate-900 text-gray-200">
 
     <!-- HEADER -->
     <header class="bg-slate-900/80 backdrop-blur-sm sticky top-0 z-40 w-full border-b border-slate-700">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
             <!-- Left-aligned Action -->
-            <button id="analyze-data-btn" onclick="window.openModal('data-analysis-modal')" class="hidden md:flex items-center space-x-2 text-gray-300 hover:text-amber-500 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+            <button id="analyze-data-btn" onclick="window.openModal('data-analysis-modal')"
+                class="hidden md:flex items-center space-x-2 text-gray-300 hover:text-amber-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
+                        clip-rule="evenodd" />
+                </svg>
                 <span>Analyze My Data</span>
             </button>
-            
+
             <!-- Centered Branding -->
             <div class="flex-1 flex justify-center items-center">
-                 <div class="flex items-center space-x-3">
-                    <img src="https://placehold.co/40x40/f59e0b/111827?text=H" alt="HotDropz Logo" class="h-10 w-10 rounded-full border-2 border-amber-600">
+                <div class="flex items-center space-x-3">
+                    <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=80&h=80&fit=crop"
+                        alt="HotDropz Logo" class="h-10 w-10 rounded-full border-2 border-amber-600">
                     <h1 class="text-2xl md:text-3xl font-bold text-amber-500 tracking-wider">HotDropz</h1>
                 </div>
             </div>
 
             <!-- Right-aligned Action -->
-            <button id="auth-btn" onclick="window.openAuthModal()" class="flex items-center space-x-2 text-gray-300 hover:text-amber-500 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <button id="auth-btn" onclick="window.openAuthModal()"
+                class="flex items-center space-x-2 text-gray-300 hover:text-amber-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 <span class="hidden md:inline">Profile</span>
             </button>
         </div>
@@ -93,17 +130,25 @@
 
     <!-- MAIN CONTENT -->
     <main class="container mx-auto p-4 sm:p-6 lg:p-8">
-        
+
         <!-- CONTROL PANEL -->
         <div class="bg-slate-800 p-4 rounded-lg shadow-lg mb-8 space-y-6">
             <!-- Filters: Season & Category -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <div id="season-filters" class="flex flex-wrap gap-2">
-                         <button onclick="window.setSeason('Summer')" class="filter-btn season-btn bg-slate-700 hover:bg-amber-600 text-gray-200 font-semibold py-2 px-4 rounded-lg transition-all duration-200">☀️ Summer</button>
-                         <button onclick="window.setSeason('Monsoon')" class="filter-btn season-btn bg-slate-700 hover:bg-amber-600 text-gray-200 font-semibold py-2 px-4 rounded-lg transition-all duration-200">🌧️ Monsoon</button>
-                         <button onclick="window.setSeason('Festival')" class="filter-btn season-btn bg-slate-700 hover:bg-amber-600 text-gray-200 font-semibold py-2 px-4 rounded-lg transition-all duration-200">🪔 Festival</button>
-                         <button onclick="window.setSeason('Winter')" class="filter-btn season-btn bg-slate-700 hover:bg-amber-600 text-gray-200 font-semibold py-2 px-4 rounded-lg transition-all duration-200">❄️ Winter</button>
+                        <button onclick="window.setSeason('Summer')"
+                            class="filter-btn season-btn bg-slate-700 hover:bg-amber-600 text-gray-200 font-semibold py-2 px-4 rounded-lg transition-all duration-200">☀️
+                            Summer</button>
+                        <button onclick="window.setSeason('Monsoon')"
+                            class="filter-btn season-btn bg-slate-700 hover:bg-amber-600 text-gray-200 font-semibold py-2 px-4 rounded-lg transition-all duration-200">🌧️
+                            Monsoon</button>
+                        <button onclick="window.setSeason('Festival')"
+                            class="filter-btn season-btn bg-slate-700 hover:bg-amber-600 text-gray-200 font-semibold py-2 px-4 rounded-lg transition-all duration-200">🪔
+                            Festival</button>
+                        <button onclick="window.setSeason('Winter')"
+                            class="filter-btn season-btn bg-slate-700 hover:bg-amber-600 text-gray-200 font-semibold py-2 px-4 rounded-lg transition-all duration-200">❄️
+                            Winter</button>
                     </div>
                 </div>
                 <div>
@@ -113,9 +158,10 @@
                 </div>
             </div>
             <!-- Filters: Region & Search -->
-             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                 <div>
-                    <select id="region-selector" onchange="window.setRegion(this.value)" class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg p-2 focus:ring-amber-500 focus:border-amber-500">
+                    <select id="region-selector" onchange="window.setRegion(this.value)"
+                        class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg p-2 focus:ring-amber-500 focus:border-amber-500">
                         <option value="National">🇮🇳 National Average</option>
                         <option value="North">⛰️ North India</option>
                         <option value="South">🌴 South India</option>
@@ -123,10 +169,15 @@
                     </select>
                 </div>
                 <div class="relative">
-                    <input type="text" id="search-bar" placeholder="Search products..." class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg p-2 pl-10 focus:ring-amber-500 focus:border-amber-500">
-                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="search-bar" placeholder="Search products..."
+                        class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg p-2 pl-10 focus:ring-amber-500 focus:border-amber-500">
+                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
                 </div>
-             </div>
+            </div>
         </div>
 
         <!-- PRODUCT LIST -->
@@ -134,7 +185,9 @@
             <h2 id="list-title" class="text-2xl font-bold mb-4 text-amber-500">Select a season to begin...</h2>
             <div id="product-list-container">
                 <div id="loading-indicator" class="hidden text-center p-8">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
+                    <div
+                        class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500">
+                    </div>
                     <p class="mt-2 text-lg">Calculating Forecasts...</p>
                 </div>
                 <div id="product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -146,65 +199,114 @@
 
     <!-- MODALS -->
     <!-- Product Detail Modal -->
-    <div id="product-detail-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden items-center justify-center p-4">
+    <div id="product-detail-modal"
+        class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden items-center justify-center p-4">
         <div class="modal-glass rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 relative">
-            <button onclick="window.closeModal('product-detail-modal')" class="absolute top-4 right-4 text-gray-300 hover:text-white">&times;</button>
+            <button onclick="window.closeModal('product-detail-modal')"
+                class="absolute top-4 right-4 text-gray-300 hover:text-white">&times;</button>
             <div id="product-detail-content"></div>
         </div>
     </div>
-    
+
     <!-- Authentication Modal -->
     <div id="auth-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden items-center justify-center p-4">
         <div class="modal-glass rounded-lg shadow-xl w-full max-w-md p-6 relative">
-             <button onclick="window.closeModal('auth-modal')" class="absolute top-4 right-4 text-gray-300 hover:text-white text-2xl font-bold">&times;</button>
-             <div id="auth-content"></div>
+            <button onclick="window.closeModal('auth-modal')"
+                class="absolute top-4 right-4 text-gray-300 hover:text-white text-2xl font-bold">&times;</button>
+            <div id="auth-content"></div>
         </div>
     </div>
 
     <!-- Data Analysis Modal -->
-    <div id="data-analysis-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden items-center justify-center p-4">
+    <div id="data-analysis-modal"
+        class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden items-center justify-center p-4">
         <div class="modal-glass rounded-lg shadow-xl w-full max-w-2xl p-6 relative">
-             <button onclick="window.closeModal('data-analysis-modal')" class="absolute top-4 right-4 text-gray-300 hover:text-white text-2xl font-bold">&times;</button>
-             <div id="data-analysis-content"></div>
+            <button onclick="window.closeModal('data-analysis-modal')"
+                class="absolute top-4 right-4 text-gray-300 hover:text-white text-2xl font-bold">&times;</button>
+            <div id="data-analysis-content"></div>
         </div>
     </div>
 
     <!-- AI Chatbot -->
     <div id="chatbot-container" class="fixed bottom-5 right-5 z-50">
-        <div id="chat-widget" class="hidden w-80 h-96 bg-slate-800/80 backdrop-blur-md rounded-lg shadow-2xl flex flex-col transition-all duration-300 mb-20">
+        <div id="chat-widget"
+            class="hidden w-80 h-96 bg-slate-800/80 backdrop-blur-md rounded-lg shadow-2xl flex flex-col transition-all duration-300 mb-20">
             <div class="bg-amber-600 text-white p-3 rounded-t-lg font-bold">Forecast Assistant</div>
             <div id="chat-messages" class="flex-1 p-3 overflow-y-auto"></div>
             <div class="p-2 border-t border-slate-700">
                 <form id="chat-form" class="flex items-center space-x-2">
-                    <input type="text" id="chat-input" class="flex-1 bg-slate-700 text-white rounded-lg p-2 border border-slate-600 focus:ring-amber-500 focus:border-amber-500" placeholder="Ask about trends...">
+                    <input type="text" id="chat-input"
+                        class="flex-1 bg-slate-700 text-white rounded-lg p-2 border border-slate-600 focus:ring-amber-500 focus:border-amber-500"
+                        placeholder="Ask about trends...">
                     <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white rounded-full p-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path
+                                d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                        </svg>
                     </button>
                 </form>
             </div>
         </div>
-        <button id="chatbot-toggle" onclick="window.toggleChat()" class="bg-amber-600 hover:bg-amber-700 text-white rounded-full p-4 shadow-lg flex items-center justify-center">
+        <button id="chatbot-toggle" onclick="window.toggleChat()"
+            class="bg-amber-600 hover:bg-amber-700 text-white rounded-full p-4 shadow-lg flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
-                <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h1a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
+                <path
+                    d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h1a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
             </svg>
         </button>
     </div>
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed right-5 top-5 z-[100] space-y-2"></div>
-    
+
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        
+
         // This is the main application script.
         // It's wrapped in DOMContentLoaded to ensure the HTML is fully loaded before the script runs.
         document.addEventListener('DOMContentLoaded', () => {
 
             // --- CONFIGURATION & STATE MANAGEMENT ---
+            // --- GEMINI AI SETUP ---
+            const GEMINI_API_KEY = 'AIzaSyDIt7CV_d03jLfLVNtcoH2SFVZynMuZh4Q';
+            const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+            /** Calls Gemini API with a prompt string and returns the text response with retry logic. */
+            const callGemini = async (prompt, retries = 3) => {
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const resp = await fetch(GEMINI_API_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: prompt }] }],
+                                generationConfig: { temperature: 0.75, maxOutputTokens: 512 }
+                            })
+                        });
+
+                        if (resp.status === 503) {
+                            console.warn(`Gemini API 503 (Overloaded). Waiting 30s before retry ${i + 1}/${retries}...`);
+                            await new Promise(resolve => setTimeout(resolve, 30000));
+                            continue;
+                        }
+
+                        if (!resp.ok) throw new Error(`Gemini API error ${resp.status}: ${await resp.text()}`);
+
+                        const data = await resp.json();
+                        return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'No response received.';
+                    } catch (err) {
+                        if (i === retries - 1) throw err;
+                        console.error(`Attempt ${i + 1} failed:`, err);
+                        // For non-503 errors, wait a bit less
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    }
+                }
+            };
+
             const firebaseConfig = {
                 apiKey: "YOUR_API_KEY", // Replace with your actual Firebase config
                 authDomain: "YOUR_AUTH_DOMAIN",
@@ -227,12 +329,12 @@
 
             let currentUser = null;
             let userWatchlist = new Set();
-            
+
             let currentSeason = '';
             let currentCategory = 'All';
             let currentRegion = 'National';
             let currentSearchTerm = '';
-            
+
             let debounceTimer;
 
             const baseProducts = [
@@ -241,7 +343,7 @@
                 { id: "S02", name: "Cotton T-Shirts", season: "Summer", category: "Fashion", demand: 90, price: 500, sales: [20, 30, 70, 90, 88, 75, 50, 30, 25, 22, 20, 18], materials: ["Pure Cotton", "Linen Blend", "Quick Dry"] },
                 { id: "S03", name: "Refrigerators", season: "Summer", category: "Electronics", demand: 78, price: 25000, sales: [30, 40, 65, 78, 80, 72, 60, 50, 45, 40, 35, 32], materials: ["Double Door", "Smart Inverter", "Frost Free"] },
                 { id: "S04", name: "Sunscreen Lotion", season: "Summer", category: "Beauty", demand: 95, price: 350, sales: [15, 25, 70, 95, 92, 60, 30, 20, 18, 15, 12, 10], materials: ["SPF 50", "Gel Based", "Water Resistant"] },
-                
+
                 // Monsoon Products
                 { id: "M01", name: "Umbrellas", season: "Monsoon", category: "Fashion", demand: 92, price: 400, sales: [5, 10, 20, 40, 70, 92, 90, 60, 30, 15, 10, 8], materials: ["Windproof Frame", "Automatic Open", "Compact Size"] },
                 { id: "M02", name: "Waterproof Footwear", season: "Monsoon", category: "Fashion", demand: 88, price: 800, sales: [10, 15, 25, 50, 75, 88, 85, 55, 30, 20, 15, 12], materials: ["Rubber Sole", "Quick Dry Mesh", "Anti-Skid"] },
@@ -260,7 +362,7 @@
                 { id: "W03", name: "Moisturizing Cream", season: "Winter", category: "Beauty", demand: 92, price: 300, sales: [20, 15, 10, 15, 25, 40, 60, 80, 85, 88, 92, 70], materials: ["Shea Butter", "Vitamin E Infused", "Non-Greasy"] },
                 { id: "W04", name: "Coffee & Tea Makers", season: "Winter", category: "Food", demand: 78, price: 3000, sales: [30, 25, 20, 22, 30, 45, 60, 70, 75, 78, 80, 65], materials: ["Drip Coffee", "Espresso Machine", "Electric Kettle"] }
             ];
-            
+
             // --- UI ELEMENT REFERENCES ---
             const productList = document.getElementById('product-list');
             const listTitle = document.getElementById('list-title');
@@ -283,33 +385,33 @@
                     showToast("Firebase not configured. Running in demo mode.", "warning");
                 }
             };
-            
+
             // --- RENDERING FUNCTIONS ---
-            
+
             const renderProducts = () => {
                 loadingIndicator.style.display = 'block';
                 productList.style.display = 'none';
 
                 setTimeout(() => {
                     productList.innerHTML = '';
-                    
+
                     if (!currentSeason) {
                         listTitle.textContent = 'Select a season to begin...';
                         loadingIndicator.style.display = 'none';
                         productList.style.display = 'grid';
                         return;
                     }
-                    
+
                     let filteredProducts = baseProducts.filter(p => p.season === currentSeason);
 
                     if (currentCategory !== 'All' && currentCategory !== 'My Watchlist') {
                         filteredProducts = filteredProducts.filter(p => p.category === currentCategory);
                     } else if (currentCategory === 'My Watchlist') {
-                         filteredProducts = baseProducts.filter(p => userWatchlist.has(p.id));
+                        filteredProducts = baseProducts.filter(p => userWatchlist.has(p.id));
                     }
 
                     if (currentSearchTerm) {
-                        filteredProducts = filteredProducts.filter(p => 
+                        filteredProducts = filteredProducts.filter(p =>
                             p.name.toLowerCase().includes(currentSearchTerm.toLowerCase())
                         );
                     }
@@ -323,7 +425,7 @@
                                 const material = product.materials[finalProducts.length % product.materials.length];
                                 const newPrice = Math.round(product.price * (1 + (Math.random() - 0.5) * 0.2));
                                 const newDemand = Math.min(100, Math.round(product.demand * (1 + (Math.random() - 0.1) * 0.15)));
-                                
+
                                 finalProducts.push({
                                     ...product,
                                     id: `${product.id}-${finalProducts.length}`,
@@ -336,19 +438,19 @@
                     } else {
                         finalProducts = filteredProducts;
                     }
-                    
+
                     // Apply regional adjustments
                     finalProducts = finalProducts.map(p => {
                         let demandMultiplier = 1.0;
-                        if(currentRegion === 'North') {
-                            if(p.season === 'Winter' || p.season === 'Festival') demandMultiplier = 1.15;
-                            if(p.season === 'Summer' || p.season === 'Monsoon') demandMultiplier = 0.9;
+                        if (currentRegion === 'North') {
+                            if (p.season === 'Winter' || p.season === 'Festival') demandMultiplier = 1.15;
+                            if (p.season === 'Summer' || p.season === 'Monsoon') demandMultiplier = 0.9;
                         } else if (currentRegion === 'South') {
-                            if(p.season === 'Summer' || p.season === 'Monsoon') demandMultiplier = 1.15;
-                            if(p.season === 'Winter') demandMultiplier = 0.85;
+                            if (p.season === 'Summer' || p.season === 'Monsoon') demandMultiplier = 1.15;
+                            if (p.season === 'Winter') demandMultiplier = 0.85;
                         } else if (currentRegion === 'Coastal') {
-                            if(p.season === 'Monsoon') demandMultiplier = 1.25;
-                            if(p.season === 'Winter') demandMultiplier = 0.8;
+                            if (p.season === 'Monsoon') demandMultiplier = 1.25;
+                            if (p.season === 'Winter') demandMultiplier = 0.8;
                         }
                         return { ...p, demand: Math.min(100, Math.round(p.demand * demandMultiplier)) };
                     });
@@ -361,118 +463,116 @@
                         // Enhanced image mapping with comprehensive product coverage
                         const getProductImage = (product) => {
                             const imageMap = {
-                                // Electronics
-                                'Air Conditioners': 'https://placehold.co/400x300/1e293b/f59e0b?text=Air+Conditioner',
-                                'Refrigerators': 'https://placehold.co/400x300/1e293b/f59e0b?text=Refrigerator',
-                                'Dehumidifiers': 'https://placehold.co/400x300/1e293b/f59e0b?text=Dehumidifier',
-                                'Smartphones': 'https://placehold.co/400x300/1e293b/f59e0b?text=Smartphone',
-                                'Water Heaters': 'https://placehold.co/400x300/1e293b/f59e0b?text=Water+Heater',
-                                'Geysers': 'https://placehold.co/400x300/1e293b/f59e0b?text=Geyser',
-                                'Copper Coil': 'https://placehold.co/400x300/1e293b/f59e0b?text=Copper+Coil+AC',
-                                'Inverter Tech': 'https://placehold.co/400x300/1e293b/f59e0b?text=Inverter+AC',
-                                'Smart WiFi': 'https://placehold.co/400x300/1e293b/f59e0b?text=Smart+WiFi+AC',
-                                'Double Door': 'https://placehold.co/400x300/1e293b/f59e0b?text=Double+Door+Fridge',
-                                'Smart Inverter': 'https://placehold.co/400x300/1e293b/f59e0b?text=Smart+Inverter+Fridge',
-                                'Frost Free': 'https://placehold.co/400x300/1e293b/f59e0b?text=Frost+Free+Fridge',
-                                '5G Enabled': 'https://placehold.co/400x300/1e293b/f59e0b?text=5G+Smartphone',
-                                'AMOLED Display': 'https://placehold.co/400x300/1e293b/f59e0b?text=AMOLED+Phone',
-                                'Triple Camera': 'https://placehold.co/400x300/1e293b/f59e0b?text=Triple+Camera+Phone',
+                                // Electronics - Product Images
+                                'Air Conditioners': 'images/smart%20airconditionar.webp',
+                                'Refrigerators': 'images/double%20door%20%20refrigrator.webp',
+                                'Dehumidifiers': 'images/Dehumidifiers.jpg',
+                                'Smartphones': 'images/mobile.jpg',
+                                'Water Heaters': 'images/hetr.jpg',
+                                'Geysers': 'images/htr.jpg',
+                                'Copper Coil': 'images/copper%20coil%20air%20conditioner.webp',
+                                'Inverter Tech': 'images/inverter%20tech.jpg',
+                                'Smart WiFi': 'images/wifi%20enable%20air%20conditioner.png',
+                                'Double Door': 'images/double%20door%20%20refrigrator.webp',
+                                'Smart Inverter': 'images/refrigerator%20smart%20ineveter.jpg',
+                                'Frost Free': 'images/refrigerator%20smart%20ineveter.jpg',
+                                '5G Enabled': 'images/mobi.jpg',
+                                'AMOLED Display': 'images/mobile.jpg',
+                                'Triple Camera': 'images/t%20mbl.jpg',
 
-                                // Fashion
-                                'Pure Cotton': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Pure+Cotton+Tee',
-                                'Linen Blend': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Linen+Blend+Tee',
-                                'Quick Dry': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Quick+Dry+Tee',
-                                'Cotton T-Shirts': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Cotton+T-Shirt',
-                                'Umbrellas': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Umbrella',
-                                'Waterproof Footwear': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Waterproof+Shoes',
-                                'Ethnic Wear': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Ethnic+Wear',
-                                'Kurta': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Kurta',
-                                'Jackets': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Jacket',
-                                'Hoodies': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Hoodie',
-                                'Windproof Frame': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Windproof+Umbrella',
-                                'Automatic Open': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Auto+Open+Umbrella',
-                                'Compact Size': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Compact+Umbrella',
-                                'Rubber Sole': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Rubber+Sole+Shoes',
-                                'Anti-Skid': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Anti-Skid+Shoes',
-                                'Hand-Embroidered': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Hand+Embroidered',
-                                'Designer Kurta': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Designer+Kurta',
-                                'Fleece Lined': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Fleece+Hoodie',
-                                'Water Resistant Shell': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Water+Resistant+Jacket',
-                                'Puffer Style': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Puffer+Jacket',
+                                // Fashion - Clothing and Accessories
+                                'Pure Cotton': 'images/pure%20cottontshirt.jpg',
+                                'Linen Blend': 'images/linen%20t%20shirt.png',
+                                'Quick Dry': 'images/quick%20dry%20t%20sirt.jpg',
+                                'Cotton T-Shirts': 'images/pure%20cottontshirt.jpg',
+                                'Umbrellas': 'images/download%20(3).jpg',
+                                'Waterproof Footwear': 'images/boots-waterproof-footwear.png',
+                                'Ethnic Wear': 'images/ethinic%20wear.jpg',
+                                'Kurta': 'images/ethinic%20wear%20wmn.jpg',
+                                'Jackets': 'images/download%20(5).jpg',
+                                'Hoodies': 'images/download%20(5).jpg',
+                                'Windproof Frame': 'images/shopping.webp',
+                                'Automatic Open': 'images/shopping.webp',
+                                'Compact Size': 'images/shopping.webp',
+                                'Rubber Sole': 'images/shoe-boot-blundstone-footwear.jpg',
+                                'Anti-Skid': 'images/shoe-boot-blundstone-footwear.jpg',
+                                'Hand-Embroidered': 'images/ethinic%20wear.jpg',
+                                'Designer Kurta': 'images/ethinic%20wear%20wmn.jpg',
+                                'Fleece Lined': 'images/kido%20wear.jpg',
+                                'Water Resistant Shell': 'images/kido%20wear.jpg',
+                                'Puffer Style': 'images/kido%20wear.jpg',
 
                                 // Beauty & Personal Care
-                                'Sunscreen Lotion': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Sunscreen+Lotion',
-                                'SPF 50': 'https://placehold.co/400x300/3b1f4f/c084fc?text=SPF+50+Sunscreen',
-                                'Gel Based': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Gel+Sunscreen',
-                                'Water Resistant': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Water+Resistant+SPF',
-                                'Jewellery': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Jewellery',
-                                'Gold Plated': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Gold+Plated+Jewellery',
-                                'Kundan Set': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Kundan+Set',
-                                'Silver Oxidised': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Silver+Jewellery',
-                                'Moisturizing Cream': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Moisturizing+Cream',
-                                'Shea Butter': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Shea+Butter+Cream',
-                                'Vitamin E Infused': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Vitamin+E+Cream',
-                                'Non-Greasy': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Non-Greasy+Cream',
+                                'Sunscreen Lotion': 'images/sunscreen%20spf50.avif',
+                                'SPF 50': 'images/sunscreen%20spf50.avif',
+                                'Gel Based': 'images/sunscreen%20gel.avif',
+                                'Water Resistant': 'images/sunscreen%20gel.avif',
+                                'Jewellery': 'images/jewellery.jpg',
+                                'Gold Plated': 'images/trnd%20jwl.jpg',
+                                'Kundan Set': 'images/chain.jpg',
+                                'Silver Oxidised': 'images/jewlry.jpg',
+                                'Moisturizing Cream': 'https://png.pngtree.com/png-vector/20241030/ourlarge/pngtree-glow-hydrate-moisturizer-jar-png-image_14201181.png',
+                                'Shea Butter': 'images/download%20(4).jpg',
+                                'Vitamin E Infused': 'images/mo.jpg',
+                                'Non-Greasy': 'images/mo.jpg',
 
                                 // Automotive
-                                'Car Wiper Blades': 'https://placehold.co/400x300/1a2e1a/4ade80?text=Car+Wiper+Blades',
-                                'Frameless Design': 'https://placehold.co/400x300/1a2e1a/4ade80?text=Frameless+Wiper',
-                                'Silicone Blade': 'https://placehold.co/400x300/1a2e1a/4ade80?text=Silicone+Wiper',
-                                'All-Weather': 'https://placehold.co/400x300/1a2e1a/4ade80?text=All-Weather+Wiper',
+                                'Car Wiper Blades': 'images/car-angle-wiper-blade.jpg',
+                                'Frameless Design': 'images/windshield-car-thumbnail.jpg',
+                                'Silicone Blade': 'images/car-windscreen-wiper-windshield-clip-art-picture-of-a-shiel.jpg',
+                                'All-Weather': 'images/-windshield-wiper-a-closeup-view-at-the-car-show-pn.png',
 
                                 // Food & Beverages
-                                'Sweets': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Indian+Sweets',
-                                'Gift Packs': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Gift+Pack',
-                                'Dry Fruit Combo': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Dry+Fruit+Combo',
-                                'Assorted Chocolates': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Chocolates',
-                                'Traditional Mithai': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Traditional+Mithai',
-                                'Coffee': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Coffee+Maker',
-                                'Tea Makers': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Tea+Maker',
-                                'Drip Coffee': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Drip+Coffee',
-                                'Espresso Machine': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Espresso+Machine',
-                                'Electric Kettle': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Electric+Kettle',
-                                'Instant Heating': 'https://placehold.co/400x300/1e293b/f59e0b?text=Instant+Heating+Geyser',
-                                '5-Star Energy Rated': 'https://placehold.co/400x300/1e293b/f59e0b?text=5-Star+Energy+Geyser',
-                                'Smart Control': 'https://placehold.co/400x300/1e293b/f59e0b?text=Smart+Control+Geyser'
+                                'Sweets': 'images/sweet.jpg',
+                                'Gift Packs': 'images/gift-box.png',
+                                'Dry Fruit Combo': 'images/candy%20box.jpg',
+                                'Assorted Chocolates': 'images/gift%20boc%20sb.jpg',
+                                'Traditional Mithai': 'images/swee%20and%20gift.jpg',
+                                'Coffee': 'https://png.pngtree.com/png-clipart/20240630/original/pngtree-steel-electric-tea-kettle-png-image_15449652.png',
+                                'Tea Makers': 'https://png.pngtree.com/png-clipart/20240630/original/pngtree-steel-electric-tea-kettle-png-image_15449652.png',
+                                'Drip Coffee': 'https://png.pngtree.com/png-clipart/20240630/original/pngtree-steel-electric-tea-kettle-png-image_15449652.png',
+                                'Espresso Machine': 'https://png.pngtree.com/png-clipart/20240630/original/pngtree-steel-electric-tea-kettle-png-image_15449652.png',
+                                'Electric Kettle': 'images/htr.jpg',
+                                'Instant Heating': 'images/hetr.jpg',
+                                '5-Star Energy Rated': 'images/htr.jpg',
+                                'Smart Control': 'images/hetr.jpg'
                             };
-                            
+
                             // Enhanced matching with priority order
                             for (const [key, url] of Object.entries(imageMap)) {
                                 if (product.name.toLowerCase().includes(key.toLowerCase())) {
                                     return url;
                                 }
                             }
-                            
+
                             // Enhanced fallback with seasonal context
                             const seasonalImages = {
                                 'Summer': {
-                                    'Electronics': 'https://placehold.co/400x300/1e293b/f59e0b?text=Summer+Electronics',
-                                    'Fashion': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Summer+Fashion',
-                                    'Beauty': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Summer+Beauty',
-                                    'Food': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Summer+Food'
+                                    'Electronics': 'https://images.unsplash.com/photo-1631545806609-c2c0b5c2b9b8?w=400&h=300&fit=crop',
+                                    'Fashion': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=300&fit=crop',
+                                    'Beauty': 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=300&fit=crop'
                                 },
                                 'Monsoon': {
-                                    'Fashion': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Monsoon+Fashion',
-                                    'Electronics': 'https://placehold.co/400x300/1e293b/f59e0b?text=Monsoon+Electronics',
-                                    'Automotive': 'https://placehold.co/400x300/1a2e1a/4ade80?text=Monsoon+Auto',
-                                    'Food': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Monsoon+Food'
+                                    'Fashion': 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
+                                    'Electronics': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
+                                    'Automotive': 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&h=300&fit=crop'
                                 },
                                 'Festival': {
-                                    'Fashion': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Festival+Fashion',
-                                    'Electronics': 'https://placehold.co/400x300/1e293b/f59e0b?text=Festival+Electronics',
-                                    'Beauty': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Festival+Beauty',
-                                    'Food': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Festival+Food'
+                                    'Fashion': 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=300&fit=crop',
+                                    'Electronics': 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=300&fit=crop',
+                                    'Beauty': 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=300&fit=crop',
+                                    'Food': 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop'
                                 },
                                 'Winter': {
-                                    'Fashion': 'https://placehold.co/400x300/1e3a5f/60a5fa?text=Winter+Fashion',
-                                    'Electronics': 'https://placehold.co/400x300/1e293b/f59e0b?text=Winter+Electronics',
-                                    'Beauty': 'https://placehold.co/400x300/3b1f4f/c084fc?text=Winter+Beauty',
-                                    'Food': 'https://placehold.co/400x300/3b1a0f/fb923c?text=Winter+Food'
+                                    'Fashion': 'https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=400&h=300&fit=crop',
+                                    'Electronics': 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400&h=300&fit=crop',
+                                    'Beauty': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
+                                    'Food': 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop'
                                 }
                             };
-                            
-                            return seasonalImages[product.season]?.[product.category] || 
-                                   'https://placehold.co/400x300/1e293b/f59e0b?text=HotDropz+Product';
+
+                            return seasonalImages[product.season]?.[product.category] ||
+                                'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop';
                         };
 
                         card.innerHTML = `
@@ -489,14 +589,14 @@
                         `;
                         productList.appendChild(card);
                     });
-                    
+
                     updateListTitle(finalProducts.length);
                     loadingIndicator.style.display = 'none';
                     productList.style.display = 'grid';
 
                 }, 500); // Simulate network/calculation delay
             };
-            
+
             const renderFilters = () => {
                 categoryFiltersContainer.innerHTML = '';
                 if (!currentSeason) return;
@@ -505,7 +605,7 @@
                 if (currentUser && userWatchlist.size > 0) {
                     categories.push('My Watchlist');
                 }
-                
+
                 categories.forEach(cat => {
                     const button = document.createElement('button');
                     button.textContent = cat;
@@ -517,8 +617,8 @@
 
             const updateListTitle = (count) => {
                 let title = `Predicted Trends for ${currentSeason} Season`;
-                if(currentRegion !== 'National') title += ` in ${currentRegion.replace(/([A-Z])/g, ' $1').trim()}`;
-                if(currentCategory !== 'All') title += ` (Category: ${currentCategory})`;
+                if (currentRegion !== 'National') title += ` in ${currentRegion.replace(/([A-Z])/g, ' $1').trim()}`;
+                if (currentCategory !== 'All') title += ` (Category: ${currentCategory})`;
                 listTitle.textContent = title;
             };
 
@@ -548,7 +648,7 @@
                 updateURL();
                 renderProducts();
             };
-            
+
             searchBar.addEventListener('input', (e) => {
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(() => {
@@ -558,13 +658,13 @@
             });
 
             // --- URL STATE MANAGEMENT ---
-            
+
             const updateURL = () => {
                 const params = new URLSearchParams();
                 if (currentSeason) params.set('season', currentSeason);
                 if (currentCategory) params.set('category', currentCategory);
                 if (currentRegion) params.set('region', currentRegion);
-                
+
                 // FIX: Wrap in try/catch to prevent SecurityError in blob/sandboxed environments
                 try {
                     window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
@@ -607,7 +707,7 @@
             };
 
             // --- SPECIFIC MODAL CONTENT ---
-            
+
             // Product Detail
             window.openProductDetail = (product) => {
                 const content = document.getElementById('product-detail-content');
@@ -616,57 +716,57 @@
                 const getDetailImage = (product) => {
                     const imageMap = {
                         // Electronics
-                        'Air Conditioners': 'https://placehold.co/600x400/1e293b/f59e0b?text=Air+Conditioner',
-                        'Refrigerators': 'https://placehold.co/600x400/1e293b/f59e0b?text=Refrigerator',
-                        'Dehumidifiers': 'https://placehold.co/600x400/1e293b/f59e0b?text=Dehumidifier',
-                        'Smartphones': 'https://placehold.co/600x400/1e293b/f59e0b?text=Smartphone',
-                        'Water Heaters': 'https://placehold.co/600x400/1e293b/f59e0b?text=Water+Heater',
-                        'Geysers': 'https://placehold.co/600x400/1e293b/f59e0b?text=Geyser',
+                        'Air Conditioners': 'images/smart%20airconditionar.webp',
+                        'Refrigerators': 'images/double%20door%20%20refrigrator.webp',
+                        'Dehumidifiers': 'images/Dehumidifiers.jpg',
+                        'Smartphones': 'images/mobile.jpg',
+                        'Water Heaters': 'images/hetr.jpg',
+                        'Geysers': 'images/htr.jpg',
 
-                        // Fashion
-                        'Pure Cotton': 'https://placehold.co/600x400/1e3a5f/60a5fa?text=Pure+Cotton+Tee',
-                        'Linen Blend': 'https://placehold.co/600x400/1e3a5f/60a5fa?text=Linen+Blend+Tee',
-                        'Quick Dry': 'https://placehold.co/600x400/1e3a5f/60a5fa?text=Quick+Dry+Tee',
-                        'Cotton T-Shirts': 'https://placehold.co/600x400/1e3a5f/60a5fa?text=Cotton+T-Shirt',
-                        'Umbrellas': 'https://placehold.co/600x400/1e3a5f/60a5fa?text=Umbrella',
-                        'Waterproof Footwear': 'https://placehold.co/600x400/1e3a5f/60a5fa?text=Waterproof+Shoes',
-                        'Ethnic Wear': 'https://placehold.co/600x400/1e3a5f/60a5fa?text=Ethnic+Wear',
-                        'Kurta': 'https://placehold.co/600x400/1e3a5f/60a5fa?text=Kurta',
-                        'Jackets': 'https://placehold.co/600x400/1e3a5f/60a5fa?text=Jacket',
-                        'Hoodies': 'https://placehold.co/600x400/1e3a5f/60a5fa?text=Hoodie',
+                        // Fashion - Different T-Shirt Variations
+                        'Pure Cotton': 'images/pure%20cottontshirt.jpg',
+                        'Linen Blend': 'images/linen%20t%20shirt.png',
+                        'Quick Dry': 'images/quick%20dry%20t%20sirt.jpg',
+                        'Cotton T-Shirts': 'images/pure%20cottontshirt.jpg',
+                        'Umbrellas': 'images/download%20(3).jpg',
+                        'Waterproof Footwear': 'images/boots-waterproof-footwear.png',
+                        'Ethnic Wear': 'images/ethinic%20wear.jpg',
+                        'Kurta': 'images/ethinic%20wear%20wmn.jpg',
+                        'Jackets': 'images/download%20(5).jpg',
+                        'Hoodies': 'images/download%20(5).jpg',
 
                         // Beauty
-                        'Sunscreen Lotion': 'https://placehold.co/600x400/3b1f4f/c084fc?text=Sunscreen+Lotion',
-                        'Sunscreen': 'https://placehold.co/600x400/3b1f4f/c084fc?text=Sunscreen',
-                        'Jewellery': 'https://placehold.co/600x400/3b1f4f/c084fc?text=Jewellery',
-                        'Moisturizing Cream': 'https://placehold.co/600x400/3b1f4f/c084fc?text=Moisturizing+Cream',
+                        'Sunscreen Lotion': 'images/sunscreen%20spf50.avif',
+                        'Sunscreen': 'images/sunscreen%20gel.avif',
+                        'Jewellery': 'images/jewellery.jpg',
+                        'Moisturizing Cream': 'https://png.pngtree.com/png-vector/20241030/ourlarge/pngtree-glow-hydrate-moisturizer-jar-png-image_14201181.png',
 
                         // Automotive
-                        'Car Wiper Blades': 'https://placehold.co/600x400/1a2e1a/4ade80?text=Car+Wiper+Blades',
-                        'Wiper': 'https://placehold.co/600x400/1a2e1a/4ade80?text=Wiper+Blades',
+                        'Car Wiper Blades': 'images/car-angle-wiper-blade.jpg',
+                        'Wiper': 'images/windshield-car-thumbnail.jpg',
 
                         // Food
-                        'Sweets': 'https://placehold.co/600x400/3b1a0f/fb923c?text=Indian+Sweets',
-                        'Gift Packs': 'https://placehold.co/600x400/3b1a0f/fb923c?text=Gift+Pack',
-                        'Coffee': 'https://placehold.co/600x400/3b1a0f/fb923c?text=Coffee+Maker',
-                        'Tea Makers': 'https://placehold.co/600x400/3b1a0f/fb923c?text=Tea+Maker'
+                        'Sweets': 'images/sweet.jpg',
+                        'Gift Packs': 'images/gift-box.png',
+                        'Coffee': 'images/download%20(9).jpg',
+                        'Tea Makers': 'images/download%20(9).jpg'
                     };
-                    
+
                     for (const [key, url] of Object.entries(imageMap)) {
                         if (product.name.toLowerCase().includes(key.toLowerCase())) {
                             return url;
                         }
                     }
-                    
+
                     const categoryImages = {
-                        'Electronics': 'https://placehold.co/600x400/1e293b/f59e0b?text=Electronics',
-                        'Fashion': 'https://placehold.co/600x400/1e3a5f/60a5fa?text=Fashion',
-                        'Beauty': 'https://placehold.co/600x400/3b1f4f/c084fc?text=Beauty',
-                        'Automotive': 'https://placehold.co/600x400/1a2e1a/4ade80?text=Automotive',
-                        'Food': 'https://placehold.co/600x400/3b1a0f/fb923c?text=Food'
+                        'Electronics': 'images/smart%20airconditionar.webp',
+                        'Fashion': 'images/ethinic%20wear.jpg',
+                        'Beauty': 'images/mo.jpg',
+                        'Automotive': 'images/car-angle-wiper-blade.jpg',
+                        'Food': 'images/sweet.jpg'
                     };
-                    
-                    return categoryImages[product.category] || 'https://placehold.co/600x400/1e293b/f59e0b?text=HotDropz+Product';
+
+                    return categoryImages[product.category] || 'images/smart%20airconditionar.webp';
                 };
 
                 content.innerHTML = `
@@ -700,7 +800,7 @@
 
             // Authentication
             window.openAuthModal = () => {
-                if(currentUser) {
+                if (currentUser) {
                     renderProfileView();
                 } else {
                     renderLoginView();
@@ -710,8 +810,11 @@
 
             // Data Analysis
             document.getElementById('analyze-data-btn').onclick = () => {
-                 document.getElementById('data-analysis-content').innerHTML = `
-                    <h2 class="text-2xl font-bold text-amber-500 mb-4">Personalized Sales Analysis</h2>
+                document.getElementById('data-analysis-content').innerHTML = `
+                    <div class="text-center mb-6">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200&h=150&fit=crop" alt="Data Analysis" class="rounded-lg mx-auto mb-4">
+                        <h2 class="text-2xl font-bold text-amber-500">Personalized Sales Analysis</h2>
+                    </div>
                     <p class="text-gray-300 mb-6">Upload your shop's sales data (CSV/Excel) to get a custom report on your product performance, identifying your most profitable items and seasonal trends.</p>
                     <div class="text-center">
                          <input type="file" id="sales-file-input" class="hidden" accept=".csv, .xlsx">
@@ -719,16 +822,16 @@
                     </div>
                     <div id="analysis-report" class="mt-6 hidden"></div>
                 `;
-                 window.openModal('data-analysis-modal');
+                window.openModal('data-analysis-modal');
 
-                 document.getElementById('sales-file-input').onchange = (e) => {
-                     if (e.target.files.length > 0) {
-                         const reportContainer = document.getElementById('analysis-report');
-                         reportContainer.innerHTML = `<div class="text-center text-amber-500">Analyzing ${e.target.files[0].name}...</div>`;
-                         reportContainer.classList.remove('hidden');
-                         
-                         setTimeout(() => { // Simulate analysis
-                             reportContainer.innerHTML = `
+                document.getElementById('sales-file-input').onchange = (e) => {
+                    if (e.target.files.length > 0) {
+                        const reportContainer = document.getElementById('analysis-report');
+                        reportContainer.innerHTML = `<div class="text-center text-amber-500">Analyzing ${e.target.files[0].name}...</div>`;
+                        reportContainer.classList.remove('hidden');
+
+                        setTimeout(() => { // Simulate analysis
+                            reportContainer.innerHTML = `
                                 <h3 class="font-bold text-xl text-white mb-3">Analysis Complete: Key Insights</h3>
                                 <div class="space-y-4 text-left">
                                     <div class="bg-slate-800 p-3 rounded-lg"><strong>Peak Season:</strong> Festival Season (Oct-Nov) drove 45% of your annual profit, led by Electronics.</div>
@@ -737,9 +840,9 @@
                                     <div class="bg-green-800/50 p-3 rounded-lg text-green-300"><strong>Recommendation:</strong> Increase stock for smart home devices before the Festival season.</div>
                                 </div>
                              `;
-                         }, 1500);
-                     }
-                 };
+                        }, 1500);
+                    }
+                };
             };
 
 
@@ -747,8 +850,8 @@
 
             let salesChartInstance = null;
             const createSalesChart = (product) => {
-                if(salesChartInstance) salesChartInstance.destroy();
-                
+                if (salesChartInstance) salesChartInstance.destroy();
+
                 const ctx = document.getElementById('sales-chart').getContext('2d');
                 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                 const priceData = product.sales.map(sale => {
@@ -788,17 +891,17 @@
                         maintainAspectRatio: false,
                         interaction: { mode: 'index', intersect: false },
                         scales: {
-                            y: { 
+                            y: {
                                 type: 'linear', position: 'left',
                                 grid: { color: 'rgba(255, 255, 255, 0.1)' },
                                 ticks: { color: '#d1d5db' },
-                                title: { display: true, text: 'Demand Score (%)', color: '#10b981'}
+                                title: { display: true, text: 'Demand Score (%)', color: '#10b981' }
                             },
                             y1: {
                                 type: 'linear', position: 'right',
                                 grid: { drawOnChartArea: false },
                                 ticks: { color: '#d1d5db' },
-                                title: { display: true, text: 'Forecast Price (₹)', color: '#ef4444'}
+                                title: { display: true, text: 'Forecast Price (₹)', color: '#ef4444' }
                             },
                             x: {
                                 grid: { color: 'rgba(255, 255, 255, 0.1)' },
@@ -824,13 +927,13 @@
                             ...userDoc.data()
                         };
                         fetchWatchlist();
-                        if(currentUser.location) { // Auto-sync region
-                             const regionMap = { 'delhi': 'North', 'mumbai': 'Coastal', 'chennai': 'South', 'kolkata': 'Coastal', 'bangalore': 'South' };
-                             const locationKey = currentUser.location.toLowerCase();
-                             if(regionMap[locationKey]) {
-                                 document.getElementById('region-selector').value = regionMap[locationKey];
-                                 setRegion(regionMap[locationKey]);
-                             }
+                        if (currentUser.location) { // Auto-sync region
+                            const regionMap = { 'delhi': 'North', 'mumbai': 'Coastal', 'chennai': 'South', 'kolkata': 'Coastal', 'bangalore': 'South' };
+                            const locationKey = currentUser.location.toLowerCase();
+                            if (regionMap[locationKey]) {
+                                document.getElementById('region-selector').value = regionMap[locationKey];
+                                setRegion(regionMap[locationKey]);
+                            }
                         }
                     } else {
                         currentUser = null;
@@ -844,7 +947,7 @@
             const updateAuthUI = (user) => {
                 const authBtn = document.getElementById('auth-btn');
                 const analyzeBtn = document.getElementById('analyze-data-btn');
-                if(user) {
+                if (user) {
                     authBtn.innerHTML = `
                          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd" /></svg>
                          <span class="hidden md:inline">View Profile</span>
@@ -860,8 +963,11 @@
             };
 
             const renderLoginView = () => {
-                 document.getElementById('auth-content').innerHTML = `
-                    <h2 class="text-2xl font-bold text-amber-500 mb-4 text-center">Sign In</h2>
+                document.getElementById('auth-content').innerHTML = `
+                    <div class="text-center mb-6">
+                        <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=80&h=80&fit=crop" alt="HotDropz Logo" class="h-16 w-16 rounded-full border-2 border-amber-600 mx-auto mb-4">
+                        <h2 class="text-2xl font-bold text-amber-500">Sign In</h2>
+                    </div>
                     <form id="login-form" class="space-y-4">
                         <input type="email" id="login-email" placeholder="Email" required class="w-full p-2 bg-slate-700 rounded border border-slate-600">
                         <input type="password" id="login-password" placeholder="Password" required class="w-full p-2 bg-slate-700 rounded border border-slate-600">
@@ -869,12 +975,15 @@
                     </form>
                     <p class="text-center mt-4">New user? <button onclick="window.renderRegisterView()" class="text-amber-500 hover:underline">Create an account</button></p>
                  `;
-                 document.getElementById('login-form').onsubmit = handleLogin;
+                document.getElementById('login-form').onsubmit = handleLogin;
             };
 
             window.renderRegisterView = () => {
-                 document.getElementById('auth-content').innerHTML = `
-                    <h2 class="text-2xl font-bold text-amber-500 mb-4 text-center">Create Account</h2>
+                document.getElementById('auth-content').innerHTML = `
+                    <div class="text-center mb-6">
+                        <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=80&h=80&fit=crop" alt="HotDropz Logo" class="h-16 w-16 rounded-full border-2 border-amber-600 mx-auto mb-4">
+                        <h2 class="text-2xl font-bold text-amber-500">Create Account</h2>
+                    </div>
                     <form id="register-form" class="space-y-4">
                         <input type="email" id="register-email" placeholder="Email" required class="w-full p-2 bg-slate-700 rounded border border-slate-600">
                         <input type="password" id="register-password" placeholder="Password (min. 6 characters)" required class="w-full p-2 bg-slate-700 rounded border border-slate-600">
@@ -882,12 +991,15 @@
                     </form>
                     <p class="text-center mt-4">Already have an account? <button onclick="window.renderLoginView()" class="text-amber-500 hover:underline">Sign In</button></p>
                  `;
-                 document.getElementById('register-form').onsubmit = handleRegister;
+                document.getElementById('register-form').onsubmit = handleRegister;
             };
 
             const renderProfileView = () => {
-                 document.getElementById('auth-content').innerHTML = `
-                    <h2 class="text-2xl font-bold text-amber-500 mb-4 text-center">My Profile</h2>
+                document.getElementById('auth-content').innerHTML = `
+                    <div class="text-center mb-6">
+                        <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=80&h=80&fit=crop" alt="HotDropz Logo" class="h-16 w-16 rounded-full border-2 border-amber-600 mx-auto mb-4">
+                        <h2 class="text-2xl font-bold text-amber-500">My Profile</h2>
+                    </div>
                     <form id="profile-form" class="space-y-4">
                          <p class="text-center text-gray-300">${currentUser.email}</p>
                          <input type="text" id="profile-shop-name" placeholder="Your Shop Name" value="${currentUser.shopName || ''}" class="w-full p-2 bg-slate-700 rounded border border-slate-600">
@@ -896,13 +1008,13 @@
                          <button type="button" onclick="window.signOutUser()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded">Sign Out</button>
                     </form>
                  `;
-                 document.getElementById('profile-form').onsubmit = handleProfileUpdate;
+                document.getElementById('profile-form').onsubmit = handleProfileUpdate;
             };
 
             // Firebase Handlers
             const handleRegister = async (e) => {
                 e.preventDefault();
-                if(!isFirebaseConfigured) { showToast("Demo Mode: Cannot create account.", "warning"); return; }
+                if (!isFirebaseConfigured) { showToast("Demo Mode: Cannot create account.", "warning"); return; }
                 const email = document.getElementById('register-email').value;
                 const password = document.getElementById('register-password').value;
                 try {
@@ -915,7 +1027,7 @@
 
             const handleLogin = async (e) => {
                 e.preventDefault();
-                if(!isFirebaseConfigured) { showToast("Demo Mode: Cannot sign in.", "warning"); return; }
+                if (!isFirebaseConfigured) { showToast("Demo Mode: Cannot sign in.", "warning"); return; }
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
                 try {
@@ -927,7 +1039,7 @@
 
             const handleProfileUpdate = async (e) => {
                 e.preventDefault();
-                if(!isFirebaseConfigured || !currentUser) { showToast("You must be signed in.", "error"); return; }
+                if (!isFirebaseConfigured || !currentUser) { showToast("You must be signed in.", "error"); return; }
                 const shopName = document.getElementById('profile-shop-name').value;
                 const location = document.getElementById('profile-location').value;
                 try {
@@ -939,7 +1051,7 @@
             };
 
             window.signOutUser = async () => {
-                if(!isFirebaseConfigured) { showToast("Signed out from demo.", "success"); return; }
+                if (!isFirebaseConfigured) { showToast("Signed out from demo.", "success"); return; }
                 try {
                     await signOut(auth);
                     closeModal('auth-modal');
@@ -957,7 +1069,7 @@
             };
 
             const toggleWatchlist = async (productId) => {
-                 if (!currentUser || !isFirebaseConfigured) {
+                if (!currentUser || !isFirebaseConfigured) {
                     showToast("Please sign in to use the watchlist.", "warning");
                     return;
                 }
@@ -972,13 +1084,13 @@
                     showToast("Added to watchlist!", "success");
                 }
                 // Re-render button in modal
-                const product = baseProducts.find(p => p.id === productId) || {id: productId};
-                openProductDetail(product); 
+                const product = baseProducts.find(p => p.id === productId) || { id: productId };
+                openProductDetail(product);
                 renderFilters();
             };
 
             // --- AI & CHATBOT LOGIC ---
-            
+
             // Enhanced AI Description Generator with better prompts
             const generateProductDescription = async (product) => {
                 const btn = document.getElementById('generate-desc-btn');
@@ -986,48 +1098,58 @@
                 const textarea = document.getElementById('ai-description');
                 const copyBtn = document.getElementById('copy-desc-btn');
 
-                btn.textContent = 'Generating...';
+                btn.textContent = '\u2728 Generating with Gemini...';
                 btn.disabled = true;
 
-                // Enhanced AI-generated descriptions based on product details
-                const descriptions = {
-                    'Air Conditioners': `Experience ultimate comfort with our premium Air Conditioners featuring advanced inverter technology and smart WiFi controls. Energy-efficient cooling with whisper-quiet operation, perfect for ${currentRegion}'s climate. 5-star rated with copper coil durability. Transform your space into a cool sanctuary this ${product.season}.`,
-                    
-                    'Cotton T-Shirts': `Discover unmatched comfort with our premium Cotton T-Shirts collection. Crafted from ${product.materials?.[0] || 'pure cotton'}, these shirts offer breathable luxury perfect for ${product.season} weather. Available in vibrant colors with superior fit and finish. Your go-to choice for style and comfort at just ₹${product.price}.`,
-                    
-                    'Smartphones': `Unleash the power of technology with our latest 5G-enabled Smartphones featuring stunning AMOLED displays and advanced triple camera systems. Perfect for capturing ${product.season} memories with crystal-clear quality. Premium performance meets affordability at ₹${product.price}. Upgrade your digital lifestyle today.`,
-                    
-                    'Ethnic Wear': `Celebrate tradition with our exquisite Ethnic Wear collection featuring hand-embroidered designs and premium silk blends. Perfect for ${product.season} festivities, each piece tells a story of craftsmanship and elegance. Make every occasion memorable with authentic Indian fashion at ₹${product.price}.`,
-                    
-                    'Sunscreen Lotion': `Protect your skin with our advanced SPF 50+ Sunscreen Lotion, specially formulated for ${currentRegion}'s intense ${product.season} sun. Water-resistant gel-based formula provides long-lasting protection without greasiness. Dermatologist-tested for all skin types. Your daily defense against harmful UV rays.`,
-                    
-                    'Umbrellas': `Stay dry and stylish with our premium Umbrellas featuring windproof frames and automatic open technology. Compact yet durable, perfect for ${product.season} weather in ${currentRegion}. Superior water resistance with ergonomic grip. Your reliable companion for every rainy day at just ₹${product.price}.`,
-                    
-                    'Jewellery': `Adorn yourself with our stunning Jewellery collection featuring authentic Kundan sets and gold-plated designs. Each piece is crafted to perfection, ideal for ${product.season} celebrations and special occasions. Timeless elegance meets contemporary style. Make every moment sparkle at ₹${product.price}.`,
-                    
-                    'Sweets': `Indulge in our premium Sweets & Gift Packs featuring traditional mithai, dry fruit combos, and assorted chocolates. Perfect for ${product.season} celebrations and gifting. Made with finest ingredients and authentic recipes. Spread joy and sweetness with every bite at ₹${product.price}.`,
-                    
-                    'Jackets': `Embrace warmth and style with our premium Jackets collection featuring fleece-lined comfort and water-resistant shells. Perfect for ${currentRegion}'s ${product.season} weather with superior insulation and modern design. Available in trendy colors and sizes. Your winter essential at ₹${product.price}.`,
-                    
-                    'Water Heaters': `Experience instant hot water with our energy-efficient Water Heaters featuring smart controls and 5-star ratings. Advanced heating technology ensures consistent temperature perfect for ${product.season} comfort. Durable construction with safety features. Upgrade your bathing experience at ₹${product.price}.`
-                };
+                try {
+                    const prompt = `You are a top Indian e-commerce copywriter. Write a persuasive product description in 3-4 sentences (max 80 words) for:
 
-                setTimeout(() => {
-                    // Find matching description or generate generic one
-                    let generatedText = descriptions['Default'] || `Discover premium quality with our ${product.name} featuring ${product.materials?.[0] || 'superior materials'} and exceptional craftsmanship. Perfectly designed for ${product.season} season in ${currentRegion}, offering unmatched value and performance. Experience excellence at just ₹${product.price}. Your trusted choice for quality and reliability.`;
-                    
-                    for (const [key, desc] of Object.entries(descriptions)) {
-                        if (product.name.toLowerCase().includes(key.toLowerCase())) {
-                            generatedText = desc;
-                            break;
-                        }
-                    }
-                    
+Product: \
+Category: \
+Season: \
+Region: \
+Price: \u20b9\
+Key features: \
+Demand Score: \%
+
+Make it compelling, season-relevant, and end with a gentle call-to-action. Do not use markdown formatting.`;
+                    const generatedText = await callGemini(prompt);
                     textarea.value = generatedText;
                     container.classList.remove('hidden');
                     btn.textContent = 'Generate AI Description';
                     btn.disabled = false;
-                }, 1500);
+                } catch (aiErr) {
+                    showToast('Gemini AI error. Check console for details.', 'error');
+                    console.error('Gemini description error:', aiErr);
+                    btn.textContent = 'Generate AI Description';
+                    btn.disabled = false;
+                    return;
+                }
+
+                //--- Legacy static descriptions (now unused, kept for reference) ---
+                const descriptions = {
+                    'Air Conditioners': `Experience ultimate comfort with our premium Air Conditioners featuring advanced inverter technology and smart WiFi controls. Energy-efficient cooling with whisper-quiet operation, perfect for ${currentRegion}'s climate. 5-star rated with copper coil durability. Transform your space into a cool sanctuary this ${product.season}.`,
+
+                    'Cotton T-Shirts': `Discover unmatched comfort with our premium Cotton T-Shirts collection. Crafted from ${product.materials?.[0] || 'pure cotton'}, these shirts offer breathable luxury perfect for ${product.season} weather. Available in vibrant colors with superior fit and finish. Your go-to choice for style and comfort at just ₹${product.price}.`,
+
+                    'Smartphones': `Unleash the power of technology with our latest 5G-enabled Smartphones featuring stunning AMOLED displays and advanced triple camera systems. Perfect for capturing ${product.season} memories with crystal-clear quality. Premium performance meets affordability at ₹${product.price}. Upgrade your digital lifestyle today.`,
+
+                    'Ethnic Wear': `Celebrate tradition with our exquisite Ethnic Wear collection featuring hand-embroidered designs and premium silk blends. Perfect for ${product.season} festivities, each piece tells a story of craftsmanship and elegance. Make every occasion memorable with authentic Indian fashion at ₹${product.price}.`,
+
+                    'Sunscreen Lotion': `Protect your skin with our advanced SPF 50+ Sunscreen Lotion, specially formulated for ${currentRegion}'s intense ${product.season} sun. Water-resistant gel-based formula provides long-lasting protection without greasiness. Dermatologist-tested for all skin types. Your daily defense against harmful UV rays.`,
+
+                    'Umbrellas': `Stay dry and stylish with our premium Umbrellas featuring windproof frames and automatic open technology. Compact yet durable, perfect for ${product.season} weather in ${currentRegion}. Superior water resistance with ergonomic grip. Your reliable companion for every rainy day at just ₹${product.price}.`,
+
+                    'Jewellery': `Adorn yourself with our stunning Jewellery collection featuring authentic Kundan sets and gold-plated designs. Each piece is crafted to perfection, ideal for ${product.season} celebrations and special occasions. Timeless elegance meets contemporary style. Make every moment sparkle at ₹${product.price}.`,
+
+                    'Sweets': `Indulge in our premium Sweets & Gift Packs featuring traditional mithai, dry fruit combos, and assorted chocolates. Perfect for ${product.season} celebrations and gifting. Made with finest ingredients and authentic recipes. Spread joy and sweetness with every bite at ₹${product.price}.`,
+
+                    'Jackets': `Embrace warmth and style with our premium Jackets collection featuring fleece-lined comfort and water-resistant shells. Perfect for ${currentRegion}'s ${product.season} weather with superior insulation and modern design. Available in trendy colors and sizes. Your winter essential at ₹${product.price}.`,
+
+                    'Water Heaters': `Experience instant hot water with our energy-efficient Water Heaters featuring smart controls and 5-star ratings. Advanced heating technology ensures consistent temperature perfect for ${product.season} comfort. Durable construction with safety features. Upgrade your bathing experience at ₹${product.price}.`
+                };
+
+                // Static timeout removed — Gemini API handles generation above.
 
                 copyBtn.onclick = () => {
                     textarea.select();
@@ -1035,16 +1157,16 @@
                     showToast("Professional description copied to clipboard!", "success");
                 };
             };
-            
+
             // Chatbot
             window.toggleChat = () => {
                 const widget = document.getElementById('chat-widget');
                 widget.classList.toggle('hidden');
-                if(!widget.classList.contains('hidden') && document.getElementById('chat-messages').children.length === 0) {
+                if (!widget.classList.contains('hidden') && document.getElementById('chat-messages').children.length === 0) {
                     addBotMessage("🚀 Welcome to HotDropz AI Assistant! I'm here to help you maximize your seasonal business opportunities. Ask me about trends, pricing, inventory, or any business strategy. How can I help you today?");
                 }
             };
-            
+
             // Enhanced AI Chatbot with comprehensive knowledge base
             const addMessage = (sender, message) => {
                 const messagesContainer = document.getElementById('chat-messages');
@@ -1057,67 +1179,86 @@
 
             const addBotMessage = (message) => addMessage('bot', message);
 
-            // Advanced AI Response System
-            const getAIResponse = (userMessage) => {
+            // --- GEMINI-POWERED CHATBOT ---
+            const getAIResponse = async (userMessage) => {
+                const season = currentSeason || 'Not selected';
+                const region = currentRegion || 'National';
+                const category = currentCategory || 'All';
+                const prompt =
+                    'You are HotDropz Forecast Assistant, an expert AI advisor for Indian seasonal retail demand forecasting.\n\n' +
+                    'Current dashboard context:\n' +
+                    '- Active Season: ' + season + '\n' +
+                    '- Active Region: ' + region + '\n' +
+                    '- Active Category: ' + category + '\n' +
+                    '- Products tracked by season:\n' +
+                    '  Summer   : Air Conditioners (85%), Cotton T-Shirts (90%), Refrigerators (78%), Sunscreen (95%)\n' +
+                    '  Monsoon  : Umbrellas (92%), Waterproof Footwear (88%), Dehumidifiers (75%), Car Wiper Blades (85%)\n' +
+                    '  Festival : Ethnic Wear (95%), Smartphones (88%), Jewellery (85%), Sweets & Gift Packs (98%)\n' +
+                    '  Winter   : Jackets & Hoodies (90%), Water Heaters (85%), Moisturizing Cream (92%), Coffee & Tea Makers (78%)\n' +
+                    '- Regional: North India +15% winter/festival; South India +15% summer/monsoon; Coastal +25% monsoon.\n\n' +
+                    'User question: "' + userMessage + '"\n\n' +
+                    'Respond as a concise Indian retail business advisor in 2-4 sentences. ' +
+                    'Use specific numbers. No markdown, no bullet points, plain text only.';
+                return await callGemini(prompt);
+
+                // Legacy keyword fallback (unreachable \u2014 kept for reference):
                 const lowerMsg = userMessage.toLowerCase();
-                
-                // Seasonal Analysis
                 if (lowerMsg.includes('summer') || lowerMsg.includes('hot')) {
                     return `For Summer season in ${currentRegion}, I recommend focusing on Air Conditioners (85% demand), Cotton T-Shirts (90% demand), and Sunscreen products (95% demand). Peak sales occur in April-June. Stock up 30% more in North India due to extreme heat.`;
                 }
-                
+
                 if (lowerMsg.includes('monsoon') || lowerMsg.includes('rain')) {
                     return `Monsoon season shows high demand for Umbrellas (92% demand) and Waterproof Footwear (88% demand). Coastal regions see 25% higher sales. Best months: June-September. Consider bundling rain gear for better margins.`;
                 }
-                
+
                 if (lowerMsg.includes('festival') || lowerMsg.includes('diwali')) {
                     return `Festival season is your goldmine! Ethnic Wear (95% demand), Smartphones (88% demand), and Sweets (98% demand) perform exceptionally. October-November sales can contribute 45% of annual profit. Increase inventory by 40%.`;
                 }
-                
+
                 if (lowerMsg.includes('winter') || lowerMsg.includes('cold')) {
                     return `Winter demand peaks for Jackets & Hoodies (90% demand), Water Heaters (85% demand), and Moisturizing Cream (92% demand). North India shows 15% higher demand. December-February are key months.`;
                 }
-                
+
                 // Product-specific insights
                 if (lowerMsg.includes('ac') || lowerMsg.includes('air conditioner')) {
                     return `Air Conditioners show 85% demand score with ₹35,000 average price. Peak season: April-June. Inverter tech and Smart WiFi models perform 20% better. Consider offering installation services for competitive advantage.`;
                 }
-                
+
                 if (lowerMsg.includes('smartphone') || lowerMsg.includes('phone')) {
                     return `Smartphones peak during Festival season (88% demand, ₹18,000 avg). 5G enabled models with AMOLED displays are trending. Festival discounts can boost sales by 35%. Target young demographics aged 18-35.`;
                 }
-                
+
                 // Business strategy queries
                 if (lowerMsg.includes('profit') || lowerMsg.includes('margin')) {
                     return `Highest profit margins: Beauty products (65%), Electronics during festivals (45%), Fashion accessories (40%). Seasonal timing increases margins by 20-30%. Bundle complementary products for higher average order value.`;
                 }
-                
+
                 if (lowerMsg.includes('stock') || lowerMsg.includes('inventory')) {
                     return `Optimal stocking strategy: Maintain 2-3 months inventory for seasonal items. Pre-season stocking saves 15% costs. Use demand scores >80% as high-priority items. Regional preferences affect stock by ±25%.`;
                 }
-                
+
                 if (lowerMsg.includes('risk') || lowerMsg.includes('loss')) {
                     return `Key risks: Overstocking off-season items (30% loss potential), weather variations affecting demand (±20%), competitor pricing (15% impact). Diversify across categories and maintain flexible supplier relationships.`;
                 }
-                
+
                 // Regional insights
                 if (lowerMsg.includes('north') || lowerMsg.includes('delhi')) {
                     return `North India preferences: Higher demand for Winter items (+15%), Festival products (+15%), AC units due to extreme summers. Price sensitivity is moderate. Focus on durability and brand value.`;
                 }
-                
+
                 if (lowerMsg.includes('south') || lowerMsg.includes('chennai') || lowerMsg.includes('bangalore')) {
                     return `South India trends: Summer products (+15%), Monsoon gear (+15%), tech-savvy consumers prefer smart features. Higher purchasing power allows premium pricing. Cotton clothing highly preferred.`;
                 }
-                
+
                 // Greetings and general
                 if (lowerMsg.includes('hello') || lowerMsg.includes('hi') || lowerMsg.includes('hey')) {
                     return `Hello! I'm your AI Forecast Assistant. I can help you with seasonal trends, product insights, pricing strategies, regional analysis, and business planning. What would you like to know about your market opportunities?`;
                 }
-                
+
                 if (lowerMsg.includes('help') || lowerMsg.includes('what can you do')) {
                     return `I can assist with: 📊 Seasonal demand analysis, 💰 Pricing strategies, 📍 Regional market insights, 📈 Profit optimization, 🎯 Product recommendations, 📦 Inventory planning, 🔮 Market forecasting, and 🏆 Competitive analysis. Ask me anything!`;
                 }
-                
+
                 // Default intelligent response
                 return `I understand you're asking about "${userMessage}". Based on current ${currentSeason} season data in ${currentRegion}, I recommend focusing on high-demand products (>80% score). Would you like specific insights about seasonal trends, pricing strategies, or regional preferences?`;
             };
@@ -1127,24 +1268,29 @@
                 const input = document.getElementById('chat-input');
                 const userMessage = input.value.trim();
                 if (!userMessage) return;
-                
+
                 addMessage('user', userMessage);
                 input.value = '';
 
-                // Show typing indicator
+                // Show animated typing indicator
                 const typingDiv = document.createElement('div');
-                typingDiv.className = 'p-2 rounded-lg mb-2 max-w-[80%] bg-slate-700 text-gray-400 self-start';
-                typingDiv.textContent = 'AI is thinking...';
+                typingDiv.className = 'p-2 rounded-lg mb-2 max-w-[80%] bg-slate-700 self-start flex items-center gap-1';
+                typingDiv.innerHTML = `<span class="inline-block w-2 h-2 bg-amber-400 rounded-full" style="animation:bounce 0.8s infinite"></span>
+                    <span class="inline-block w-2 h-2 bg-amber-300 rounded-full" style="animation:bounce 0.8s 0.15s infinite"></span>
+                    <span class="inline-block w-2 h-2 bg-amber-200 rounded-full" style="animation:bounce 0.8s 0.3s infinite"></span>`;
                 typingDiv.id = 'typing-indicator';
                 document.getElementById('chat-messages').appendChild(typingDiv);
                 document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
 
-                // Simulate AI processing time
-                setTimeout(() => {
+                try {
+                    const response = await getAIResponse(userMessage);
                     document.getElementById('typing-indicator')?.remove();
-                    const response = getAIResponse(userMessage);
                     addBotMessage(response);
-                }, 1000 + Math.random() * 1000); // 1-2 second delay for realism
+                } catch (chatErr) {
+                    document.getElementById('typing-indicator')?.remove();
+                    addBotMessage('\u26a0\ufe0f Gemini AI is unavailable right now. Please check your connection and try again.');
+                    console.error('Chatbot Gemini error:', chatErr);
+                }
             };
 
             // Start the application
@@ -1152,4 +1298,5 @@
         });
     </script>
 </body>
+
 </html>
